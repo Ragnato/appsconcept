@@ -1,4 +1,4 @@
-FROM golang:1.21
+FROM golang:1.22
 
 WORKDIR /app
 
@@ -7,7 +7,6 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o fizzbuzz
+RUN go build -o fizzbuzz ./cmd
 
-EXPOSE 8080
 CMD ["./fizzbuzz"]

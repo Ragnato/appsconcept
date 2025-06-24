@@ -8,6 +8,7 @@ type FizzBuzzParams struct {
 	Str2  string `json:"str2"`
 }
 
+// will I need this? I don't think so
 type StatsResponse struct {
 	Request FizzBuzzParams `json:"request"`
 	Count   int            `json:"count"`
