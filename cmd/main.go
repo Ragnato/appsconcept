@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
 	"appsconcept/internal/api"
 	"appsconcept/internal/repository/mysql"
 	"appsconcept/internal/service"
-	"log"
-	"net/http"
 )
 
 func main() {

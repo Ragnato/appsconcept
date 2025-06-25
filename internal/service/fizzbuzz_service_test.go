@@ -2,6 +2,7 @@ package service
 
 import (
 	"appsconcept/internal/domain"
+	"context"
 	"errors"
 	"testing"
 
@@ -12,14 +13,15 @@ type mockRepo struct {
 	saveErr error
 }
 
-func (m *mockRepo) SaveRequest(p domain.FizzBuzzParams) error {
+func (m *mockRepo) SaveRequest(ctx context.Context, p domain.FizzBuzzParams) error {
 	return m.saveErr
 }
-func (m *mockRepo) GetTopRequest() (domain.StatsResponse, error) {
-	return domain.StatsResponse{}, nil
+func (m *mockRepo) GetTopRequest(ctx context.Context) (*domain.StatsResponse, error) {
+	return &domain.StatsResponse{}, nil
 }
 
 func TestGenerateFizzBuzz_ValidInput(t *testing.T) {
+	ctx := context.Background()
 	repo := &mockRepo{}
 	svc := NewFizzBuzzService(repo)
 
@@ -36,12 +38,13 @@ func TestGenerateFizzBuzz_ValidInput(t *testing.T) {
 		"11", "fizz", "13", "14", "fizzbuzz",
 	}
 
-	result, err := svc.GenerateFizzBuzz(params)
+	result, err := svc.GenerateFizzBuzz(ctx, params)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }
 
 func TestGenerateFizzBuzz_InvalidInput(t *testing.T) {
+	ctx := context.Background()
 	repo := &mockRepo{}
 	svc := NewFizzBuzzService(repo)
 
@@ -53,13 +56,14 @@ func TestGenerateFizzBuzz_InvalidInput(t *testing.T) {
 	}
 
 	for _, params := range invalidParams {
-		result, err := svc.GenerateFizzBuzz(params)
+		result, err := svc.GenerateFizzBuzz(ctx, params)
 		assert.Error(t, err)
 		assert.Nil(t, result)
 	}
 }
 
 func TestGenerateFizzBuzz_SaveRequestFails(t *testing.T) {
+	ctx := context.Background()
 	repo := &mockRepo{saveErr: errors.New("db error")}
 	svc := NewFizzBuzzService(repo)
 
@@ -71,7 +75,7 @@ func TestGenerateFizzBuzz_SaveRequestFails(t *testing.T) {
 		Str2:  "buzz",
 	}
 
-	result, err := svc.GenerateFizzBuzz(params)
+	result, err := svc.GenerateFizzBuzz(ctx, params)
 	assert.Error(t, err)
 	assert.Nil(t, result)
 }
