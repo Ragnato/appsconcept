@@ -8,7 +8,7 @@ type FizzBuzzParams struct {
 	Str2  string `json:"str2"`
 }
 
-// will I need this? I don't think so
+// need to create this on a dto package
 type StatsResponse struct {
 	Request FizzBuzzParams `json:"request"`
 	Count   int            `json:"count"`

@@ -7,6 +7,6 @@ import (
 )
 
 type FizzBuzzRepository interface {
-	SaveRequest(c context.Context, params domain.FizzBuzzParams) error
-	GetTopRequest() (domain.StatsResponse, error)
+	SaveRequest(ctx context.Context, params domain.FizzBuzzParams) error
+	GetTopRequest(ctx context.Context) (*domain.StatsResponse, error)
 }

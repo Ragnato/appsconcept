@@ -16,29 +16,29 @@ func NewFizzBuzzService(r repository.FizzBuzzRepository) *FizzBuzzService {
 	return &FizzBuzzService{repo: r}
 }
 
-func (s *FizzBuzzService) GenerateFizzBuzz(c context.Context, p domain.FizzBuzzParams) ([]string, error) {
-	if p.Int1 <= 0 || p.Int2 <= 0 || p.Limit <= 0 {
+func (s *FizzBuzzService) GenerateFizzBuzz(ctx context.Context, params domain.FizzBuzzParams) ([]string, error) {
+	if params.Int1 <= 0 || params.Int2 <= 0 || params.Limit <= 0 {
 		return nil, fmt.Errorf("int1, int2, and limit must be positive integers")
 	}
 
-	if p.Str1 == "" || p.Str2 == "" {
+	if params.Str1 == "" || params.Str2 == "" {
 		return nil, fmt.Errorf("str1 and str2 must not be empty")
 	}
 
-	err := s.repo.SaveRequest(c, p)
+	err := s.repo.SaveRequest(ctx, params)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]string, 0, p.Limit)
-	for i := 1; i <= p.Limit; i++ {
+	result := make([]string, 0, params.Limit)
+	for i := 1; i <= params.Limit; i++ {
 		switch {
-		case i%p.Int1 == 0 && i%p.Int2 == 0:
-			result = append(result, p.Str1+p.Str2)
-		case i%p.Int1 == 0:
-			result = append(result, p.Str1)
-		case i%p.Int2 == 0:
-			result = append(result, p.Str2)
+		case i%params.Int1 == 0 && i%params.Int2 == 0:
+			result = append(result, params.Str1+params.Str2)
+		case i%params.Int1 == 0:
+			result = append(result, params.Str1)
+		case i%params.Int2 == 0:
+			result = append(result, params.Str2)
 		default:
 			result = append(result, fmt.Sprintf("%d", i))
 		}
@@ -46,6 +46,7 @@ func (s *FizzBuzzService) GenerateFizzBuzz(c context.Context, p domain.FizzBuzzP
 
 	return result, nil
 }
-func (s *FizzBuzzService) GetStats() (domain.StatsResponse, error) {
-	return s.repo.GetTopRequest()
+func (s *FizzBuzzService) GetStats(ctx context.Context) (*domain.StatsResponse, error) {
+	result, err := s.repo.GetTopRequest(ctx)
+	return result, err
 }

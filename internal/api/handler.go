@@ -54,8 +54,10 @@ func (h *Handler) FizzBuzz(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Stats(w http.ResponseWriter, r *http.Request) {
-	stats, err := h.service.GetStats()
+	ctx := context.Background()
+	stats, err := h.service.GetStats(ctx)
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, "Stats unavailable", http.StatusInternalServerError)
 		return
 	}

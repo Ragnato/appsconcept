@@ -37,24 +37,32 @@ func (r *FizzBuzzRepo) SaveRequest(ctx context.Context, params domain.FizzBuzzPa
 
 	_, err := r.db.ExecContext(ctx, query, params.Int1, params.Int2, params.Limit, params.Str1, params.Str2)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (r *FizzBuzzRepo) GetTopRequest() (domain.StatsResponse, error) {
-	var res domain.StatsResponse
+func (r *FizzBuzzRepo) GetTopRequest(ctx context.Context) (*domain.StatsResponse, error) {
+	query := "SELECT `int1`, `int2`, `limit_val`, `str1`, `str2`, COUNT(*) as `count_val` FROM `fizzbuzz_requests` GROUP BY `int1`, `int2`, `limit_val`, `str1`, `str2` ORDER BY `count_val` DESC LIMIT 1"
 
-	row := r.db.QueryRow(`
-		SELECT int1, int2, limit_val, str1, str2, count
-		FROM fizzbuzz_requests
-		ORDER BY count DESC
-		LIMIT 1;
-	`)
+	row := r.db.QueryRowContext(ctx, query)
 
-	err := row.Scan(&res.Request.Int1, &res.Request.Int2, &res.Request.Limit,
-		&res.Request.Str1, &res.Request.Str2, &res.Count)
-	return res, err
+	var int1, int2, limit, count int
+	var str1, str2 string
+
+	err := row.Scan(&int1, &int2, &limit, &str1, &str2, &count)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &domain.StatsResponse{
+		Request: domain.FizzBuzzParams{
+			Int1:  int1,
+			Int2:  int2,
+			Limit: limit,
+			Str1:  str1,
+			Str2:  str2,
+		},
+		Count: count,
+	}
+
+	return response, nil
 }
