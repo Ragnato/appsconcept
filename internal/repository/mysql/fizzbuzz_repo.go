@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"context"
+
 	"appsconcept/internal/domain"
 	"appsconcept/internal/repository"
 	"database/sql"
@@ -30,13 +32,16 @@ func NewFizzBuzzRepo(db *sql.DB) repository.FizzBuzzRepository {
 	return &FizzBuzzRepo{db: db}
 }
 
-func (r *FizzBuzzRepo) SaveRequest(p domain.FizzBuzzParams) error {
-	_, err := r.db.Exec(`
-		INSERT INTO fizzbuzz_requests (int1, int2, limit_val, str1, str2, count)
-		VALUES (?, ?, ?, ?, ?, 1)
-		ON DUPLICATE KEY UPDATE count = count + 1;
-	`, p.Int1, p.Int2, p.Limit, p.Str1, p.Str2)
-	return err
+func (r *FizzBuzzRepo) SaveRequest(ctx context.Context, params domain.FizzBuzzParams) error {
+	query := "INSERT INTO fizzbuzz_requests (`int1`, `int2`, `limit_val`, `str1`, `str2`) VALUES (?, ?, ?, ?, ?)"
+
+	_, err := r.db.ExecContext(ctx, query, params.Int1, params.Int2, params.Limit, params.Str1, params.Str2)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *FizzBuzzRepo) GetTopRequest() (domain.StatsResponse, error) {

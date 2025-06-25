@@ -1,8 +1,12 @@
 package repository
 
-import "appsconcept/internal/domain"
+import (
+	"context"
+
+	"appsconcept/internal/domain"
+)
 
 type FizzBuzzRepository interface {
-	SaveRequest(p domain.FizzBuzzParams) error
+	SaveRequest(c context.Context, params domain.FizzBuzzParams) error
 	GetTopRequest() (domain.StatsResponse, error)
 }

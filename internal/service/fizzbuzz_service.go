@@ -1,9 +1,11 @@
 package service
 
 import (
+	"context"
+	"fmt"
+
 	"appsconcept/internal/domain"
 	"appsconcept/internal/repository"
-	"fmt"
 )
 
 type FizzBuzzService struct {
@@ -14,15 +16,16 @@ func NewFizzBuzzService(r repository.FizzBuzzRepository) *FizzBuzzService {
 	return &FizzBuzzService{repo: r}
 }
 
-func (s *FizzBuzzService) GenerateFizzBuzz(p domain.FizzBuzzParams) ([]string, error) {
+func (s *FizzBuzzService) GenerateFizzBuzz(c context.Context, p domain.FizzBuzzParams) ([]string, error) {
 	if p.Int1 <= 0 || p.Int2 <= 0 || p.Limit <= 0 {
 		return nil, fmt.Errorf("int1, int2, and limit must be positive integers")
 	}
+
 	if p.Str1 == "" || p.Str2 == "" {
 		return nil, fmt.Errorf("str1 and str2 must not be empty")
 	}
 
-	err := s.repo.SaveRequest(p)
+	err := s.repo.SaveRequest(c, p)
 	if err != nil {
 		return nil, err
 	}
@@ -40,6 +43,7 @@ func (s *FizzBuzzService) GenerateFizzBuzz(p domain.FizzBuzzParams) ([]string, e
 			result = append(result, fmt.Sprintf("%d", i))
 		}
 	}
+
 	return result, nil
 }
 func (s *FizzBuzzService) GetStats() (domain.StatsResponse, error) {

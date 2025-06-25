@@ -1,11 +1,14 @@
 package api
 
 import (
-	"appsconcept/internal/domain"
-	"appsconcept/internal/service"
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
+
+	"appsconcept/internal/domain"
+	"appsconcept/internal/service"
 )
 
 type Handler struct {
@@ -17,6 +20,8 @@ func NewHandler(svc *service.FizzBuzzService) *Handler {
 }
 
 func (h *Handler) FizzBuzz(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
 	q := r.URL.Query()
 	int1, err1 := strconv.Atoi(q.Get("int1"))
 	int2, err2 := strconv.Atoi(q.Get("int2"))
@@ -37,9 +42,10 @@ func (h *Handler) FizzBuzz(w http.ResponseWriter, r *http.Request) {
 		Str2:  str2,
 	}
 
-	err, result := h.service.GenerateFizzBuzz(params)
+	result, err := h.service.GenerateFizzBuzz(ctx, params)
 	if err != nil {
-		http.Error(w, "Validation error", http.StatusBadRequest)
+		errorMessage := fmt.Sprintf("Service error: %+v", err)
+		http.Error(w, errorMessage, http.StatusBadRequest)
 		return
 	}
 
